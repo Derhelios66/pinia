@@ -39,7 +39,7 @@ export interface TestingOptions {
    * it will **only** make the `fn` argument `undefined`. You still have to
    * handle this in `createSpy()`.
    */
-  stubActions?: boolean
+  stubActions?: boolean | Array<string>
 
   /**
    * When set to true, calls to `$patch()` won't change the state. Defaults to
@@ -127,7 +127,12 @@ export function createTestingPinia({
   // stub actions
   pinia._p.push(({ store, options }) => {
     Object.keys(options.actions).forEach((action) => {
-      store[action] = stubActions ? createSpy() : createSpy(store[action])
+      if (stubActions === true || Array.isArray(stubActions) && stubActions.includes(action)) {
+        store[action] = createSpy();
+      } else {
+        store[action] = createSpy(store[action]);
+      }
+      // store[action] = stubActions ? createSpy() : createSpy(store[action])
     })
 
     store.$patch = stubPatch ? createSpy() : createSpy(store.$patch)
