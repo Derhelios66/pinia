@@ -166,6 +166,27 @@ store.someAction()
 expect(store.someAction).toHaveBeenCalledTimes(1)
 ```
 
+If you want to stub only some of your actions, specify `stubActions: ['youtActionName']` when calling `createTestingPinia`:
+
+```js
+const wrapper = mount(Counter, {
+  global: {
+    plugins: [createTestingPinia({ stubActions: ['someAction'] })],
+  },
+})
+
+const store = useSomeStore()
+
+// Now this call WILL NOT execute the implementation defined by the store
+store.someAction() // only someAciton is stubbed
+
+// Now this call WILL execute the implementation defined by the store
+store.someOtherAction()
+
+// ...but it's still wrapped with a spy, so you can inspect calls
+expect(store.someAction).toHaveBeenCalledTimes(1)
+```
+
 ### Specifying the createSpy function
 
 When using Jest, or vitest with `globals: true`, `createTestingPinia` automatically stubs actions using the spy function based on the existing test framework (`jest.fn` or `vitest.fn`). If you are using a different framework, you'll need to provide a [createSpy](/api/interfaces/pinia_testing.TestingOptions.html#createspy) option:
